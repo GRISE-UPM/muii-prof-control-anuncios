@@ -50,7 +50,7 @@ CLIENT_ID=$(aws cognito-idp create-user-pool-client \
     --allowed-o-auth-scopes openid \
     --allowed-o-auth-flows-user-pool-client \
     --callback-urls "https://100.49.5.193/" \
-    --logout-urls "https://100.49.5.193/logout" \
+    --logout-urls "https://100.49.5.193/" \
     --supported-identity-providers COGNITO \
     --query "UserPoolClient.ClientId" \
     --output text)
