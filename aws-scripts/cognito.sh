@@ -23,7 +23,7 @@ AWS_REGION="$(aws configure get region)"
 
 echo -n "Creando User Pool... "
 USER_POOL_ID=$(aws cognito-idp create-user-pool \
-    --pool-name <nombre del pool> \
+    --pool-name anuncios-pool \
     --policies '{"PasswordPolicy":{"MinimumLength":8,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":false}}' \
     --query "UserPool.Id" \
     --output text)
@@ -43,14 +43,14 @@ echo -n "Creando App Client... "
 # y puede renovar el token (refresh).
 CLIENT_ID=$(aws cognito-idp create-user-pool-client \
     --user-pool-id "$USER_POOL_ID" \
-    --client-name <nombre del cliente> \
+    --client-name anuncios-front \
     --no-generate-secret \
     --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH ALLOW_REFRESH_TOKEN_AUTH \
     --allowed-o-auth-flows code \
     --allowed-o-auth-scopes openid \
     --allowed-o-auth-flows-user-pool-client \
-    --callback-urls "https://<ip de la instancia>/callback" \
-    --logout-urls "https://<ip de la instancia>/logout" \
+    --callback-urls "https://184.196.218.197/" \
+    --logout-urls "https://184.196.218.197/" \
     --supported-identity-providers COGNITO \
     --query "UserPoolClient.ClientId" \
     --output text)
@@ -81,12 +81,12 @@ aws cognito-idp admin-add-user-to-group \
     --group-name admin
 echo "listo."
 
-cat > "$PROJECT_ROOT/back/src/main/resources/cognito.properties" <<CONF
+cat >"$PROJECT_ROOT/back/src/main/resources/cognito.properties" <<CONF
 # Generado por aws-scripts/cognito.sh. No editar a mano.
 spring.security.oauth2.resourceserver.jwt.issuer-uri=https://cognito-idp.$AWS_REGION.amazonaws.com/$USER_POOL_ID
 CONF
 
-cat > "$PROJECT_ROOT/front/config.js" <<CONF
+cat >"$PROJECT_ROOT/front/config.js" <<CONF
 // Generado por aws-scripts/cognito.sh. No editar a mano.
 window.COGNITO_CONFIG = { region: "$AWS_REGION", clientId: "$CLIENT_ID", domain: "anuncios-$EXAM_ID" };
 CONF

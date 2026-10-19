@@ -32,16 +32,19 @@ fi
 
 echo -n "Subiendo el back a la instancia... "
 # TODO: Escribe en el comando la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@<ip de la instancia>:/tmp/anuncios.jar 2>/dev/null \
-    || { echo "Error: no se ha podido subir el back a la instancia." >&2; exit 1; }
+scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@184.196.218.197:/tmp/anuncios.jar 2>/dev/null ||
+    {
+        echo "Error: no se ha podido subir el back a la instancia." >&2
+        exit 1
+    }
 echo "listo."
 
 echo "Configurando el servicio en la instancia EC2..."
 
 # SECRET_NAME y EXAM_ID viajan como variables de entorno del servicio: no van en el JAR.
 # TODO: Escribe en el comando la IP pública de la instancia.
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> \
-    "SECRET_NAME='$SECRET_NAME' EXAM_ID='$EXAM_ID' bash -s" << 'END_BACKEND'
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@184.196.218.197 \
+    "SECRET_NAME='$SECRET_NAME' EXAM_ID='$EXAM_ID' bash -s" <<'END_BACKEND'
 set -e
 sudo apt-get update -y
 # El JAR está compilado para Java 21. Si 21 no está en los repositorios, vale cualquier JRE más nuevo.

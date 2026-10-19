@@ -43,6 +43,15 @@ aws ec2 authorize-security-group-ingress \
     --output text >/dev/null
 echo "listo."
 
+echo -n "Creando regla de acceso (actuator 8090)... "
+aws ec2 authorize-security-group-ingress \
+    --group-id "$SG_ID" \
+    --protocol tcp \
+    --port 8090 \
+    --cidr 0.0.0.0/0 \
+    --output text >/dev/null
+echo "listo."
+
 echo -n "Creando la instancia (pendiente de aprovisionamiento)... "
 # Ubuntu Server 26.04 LTS (x86_64, HVM, SSD gp3), tipo t2.micro y perfil de instancia del laboratorio.
 INSTANCE_ID=$(aws ec2 run-instances \
@@ -79,14 +88,15 @@ sleep 45
 echo "listo."
 
 INSTANCE_IP=$(aws ec2 describe-addresses --allocation-ids "$ALLOCATION_ID" --query "Addresses[0].PublicIp" --output text)
-sed "s/^INSTANCE_IP=.*/INSTANCE_IP=$INSTANCE_IP/" "$PROJECT_ROOT/entrega.txt" > "$PROJECT_ROOT/entrega.txt.tmp"
+sed "s/^INSTANCE_IP=.*/INSTANCE_IP=$INSTANCE_IP/" "$PROJECT_ROOT/entrega.txt" >"$PROJECT_ROOT/entrega.txt.tmp"
 mv "$PROJECT_ROOT/entrega.txt.tmp" "$PROJECT_ROOT/entrega.txt"
 echo "IP pública de la instancia escrita en entrega.txt."
 
 # La IP también se escribe en cognito.sh (URL de retorno y de cierre de sesión), para que no haya que copiarla.
-sed "s/<ip de la instancia>/$INSTANCE_IP/g" "$PROJECT_ROOT/aws-scripts/cognito.sh" > "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp"
-cat "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp" > "$PROJECT_ROOT/aws-scripts/cognito.sh"
+sed "s/<ip de la instancia>/$INSTANCE_IP/g" "$PROJECT_ROOT/aws-scripts/cognito.sh" >"$PROJECT_ROOT/aws-scripts/cognito.sh.tmp"
+cat "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp" >"$PROJECT_ROOT/aws-scripts/cognito.sh"
 rm -f "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp"
 echo "IP pública de la instancia escrita en cognito.sh."
 
 echo "ec2.sh terminado."
+
