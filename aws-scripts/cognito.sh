@@ -7,7 +7,7 @@ set -e
 PROJECT_ROOT="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 
 if [ ! -f "$PROJECT_ROOT/params.txt" ]; then
-    echo "Error: falta params.txt. Ejecuta antes: bash params.sh <EXAM_ID>" >&2
+    echo "Error: falta params.txt. Ejecuta antes: bash params.sh 123456" >&2
     exit 1
 fi
 
@@ -23,7 +23,7 @@ AWS_REGION="$(aws configure get region)"
 
 echo -n "Creando User Pool... "
 USER_POOL_ID=$(aws cognito-idp create-user-pool \
-    --pool-name <nombre del pool> \
+    --pool-name anuncios-pool \
     --policies '{"PasswordPolicy":{"MinimumLength":8,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":false}}' \
     --query "UserPool.Id" \
     --output text)
@@ -32,7 +32,7 @@ echo "listo."
 # Dominio del Hosted UI (la página de inicio de sesión de Cognito). Debe ser único en la región.
 echo -n "Creando el dominio del Hosted UI... "
 aws cognito-idp create-user-pool-domain \
-    --domain "anuncios-$EXAM_ID" \
+    --domain "anuncios-$EXAM_ID-david" \
     --user-pool-id "$USER_POOL_ID" \
     --output text >/dev/null
 echo "listo."
@@ -43,14 +43,14 @@ echo -n "Creando App Client... "
 # y puede renovar el token (refresh).
 CLIENT_ID=$(aws cognito-idp create-user-pool-client \
     --user-pool-id "$USER_POOL_ID" \
-    --client-name <nombre del cliente> \
+    --client-name anuncios-front \
     --no-generate-secret \
     --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH ALLOW_REFRESH_TOKEN_AUTH \
     --allowed-o-auth-flows code \
     --allowed-o-auth-scopes openid \
     --allowed-o-auth-flows-user-pool-client \
-    --callback-urls "https://<ip de la instancia>/callback" \
-    --logout-urls "https://<ip de la instancia>/logout" \
+    --callback-urls "https://52.87.137.8/" \
+    --logout-urls "https://52.87.137.8/" \
     --supported-identity-providers COGNITO \
     --query "UserPoolClient.ClientId" \
     --output text)
@@ -88,7 +88,7 @@ CONF
 
 cat > "$PROJECT_ROOT/front/config.js" <<CONF
 // Generado por aws-scripts/cognito.sh. No editar a mano.
-window.COGNITO_CONFIG = { region: "$AWS_REGION", clientId: "$CLIENT_ID", domain: "anuncios-$EXAM_ID" };
+window.COGNITO_CONFIG = { region: "$AWS_REGION", clientId: "$CLIENT_ID", domain: "anuncios-$EXAM_ID-david" };
 CONF
 
 echo "Configuración de Cognito finalizada."
