@@ -28,5 +28,5 @@ if grep -qE '"[a-z]+"[[:space:]]*:[[:space:]]*""' "$PROJECT_ROOT/aws-scripts/sec
 fi
 
 echo -n "Creando el secreto... "
-aws secretsmanager create-secret --name "$SECRET_NAME" --secret-string "file://$PROJECT_ROOT/aws-scripts/secreto.json" --output text >/dev/null
+aws secretsmanager create-secret --name "$SECRET_NAME" --secret-string "$(cat "$PROJECT_ROOT/aws-scripts/secreto.json")" --output text >/dev/null
 echo "listo."
