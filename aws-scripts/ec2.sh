@@ -43,6 +43,14 @@ aws ec2 authorize-security-group-ingress \
     --output text >/dev/null
 echo "listo."
 
+echo -n "Modificación puerto 8090"
+aws ec2 authorize-security-group-ingress \
+    --group-name "$SG_NAME" \
+    --protocol tcp \
+    --port 8090 \
+    --cidr 0.0.0.0/0
+echo "listo"
+
 echo -n "Creando la instancia (pendiente de aprovisionamiento)... "
 # Ubuntu Server 26.04 LTS (x86_64, HVM, SSD gp3), tipo t2.micro y perfil de instancia del laboratorio.
 INSTANCE_ID=$(aws ec2 run-instances \
