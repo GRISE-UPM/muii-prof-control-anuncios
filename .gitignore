@@ -5,6 +5,7 @@ params.txt
 # Generados por cognito.sh
 front/config.js
 back/src/main/resources/cognito.properties
+secreto.json
 
 # Compilación
 back/target/
