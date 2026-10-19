@@ -10,3 +10,5 @@ back/src/main/resources/cognito.properties
 back/target/
 .DS_Store
 .vscode/
+
+aws-scripts/secreto.json

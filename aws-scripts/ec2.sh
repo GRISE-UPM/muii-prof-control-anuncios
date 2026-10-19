@@ -34,6 +34,16 @@ aws ec2 authorize-security-group-ingress \
     --output text >/dev/null
 echo "listo."
 
+# Se crea una regla de acceso HTTP (puerto 80) desde cualquier IP, con CIDR /0.
+echo -n "Creando regla de acceso (http)... "
+aws ec2 authorize-security-group-ingress \
+    --group-id "$SG_ID" \
+    --protocol tcp \
+    --port 80 \
+    --cidr 0.0.0.0/0 \
+    --output text >/dev/null
+echo "listo."
+
 echo -n "Creando regla de acceso (https)... "
 aws ec2 authorize-security-group-ingress \
     --group-id "$SG_ID" \
