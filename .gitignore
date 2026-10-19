@@ -10,3 +10,6 @@ back/src/main/resources/cognito.properties
 back/target/
 .DS_Store
 .vscode/
+
+ssh-key/labsuser.pem
+aws-scripts/secreto.json
