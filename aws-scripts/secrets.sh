@@ -28,5 +28,9 @@ if grep -qE '"[a-z]+"[[:space:]]*:[[:space:]]*""' "$PROJECT_ROOT/aws-scripts/sec
 fi
 
 echo -n "Creando el secreto... "
-aws secretsmanager create-secret --name "$SECRET_NAME" --secret-string "file://$PROJECT_ROOT/aws-scripts/secreto.json" --output text >/dev/null
+SECRET_FILE="$PROJECT_ROOT/aws-scripts/secreto.json"
+if command -v cygpath >/dev/null 2>&1; then
+    SECRET_FILE="$(cygpath -m "$SECRET_FILE")"
+fi
+aws secretsmanager create-secret --name "$SECRET_NAME" --secret-string "file://$SECRET_FILE" --output text >/dev/null
 echo "listo."
