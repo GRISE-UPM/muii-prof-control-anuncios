@@ -5,6 +5,7 @@
 set -e
 
 PROJECT_ROOT="$(cd -- "$(dirname -- "$0")/.." && pwd)"
+PUBLIC_IP=100.60.247.220
 
 if [ ! -f "$PROJECT_ROOT/params.txt" ]; then
     echo "Error: falta params.txt. Ejecuta antes: bash params.sh <EXAM_ID>" >&2
@@ -16,13 +17,14 @@ if [ ! -f "$PROJECT_ROOT/ssh-key/labsuser.pem" ]; then
     exit 1
 fi
 
+
 echo -n "Subiendo el front a la instancia... "
-# TODO: Escribe en cada comando (ssh, scp y ssh) la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> "rm -rf /tmp/front && mkdir /tmp/front"
-scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$PROJECT_ROOT/front"/* ubuntu@<ip de la instancia>:/tmp/front/ 2>/dev/null \
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@"$PUBLIC_IP" "rm -rf /tmp/front && mkdir /tmp/front"
+scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$PROJECT_ROOT/front"/* ubuntu@"$PUBLIC_IP":/tmp/front/ 2>/dev/null \
     || { echo "Error: no se ha podido subir el front a la instancia." >&2; exit 1; }
 
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> << 'ENDSSH'
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@"$PUBLIC_IP" << 'ENDSSH'
+
 set -e
 sudo rm -rf /var/www/html/*
 sudo mv /tmp/front/* /var/www/html/

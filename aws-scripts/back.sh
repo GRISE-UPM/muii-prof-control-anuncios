@@ -5,6 +5,7 @@
 set -e
 
 PROJECT_ROOT="$(cd -- "$(dirname -- "$0")/.." && pwd)"
+PUBLIC_IP=100.60.247.220
 
 if [ ! -f "$PROJECT_ROOT/params.txt" ]; then
     echo "Error: falta params.txt. Ejecuta antes: bash params.sh <EXAM_ID>" >&2
@@ -32,7 +33,7 @@ fi
 
 echo -n "Subiendo el back a la instancia... "
 # TODO: Escribe en el comando la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@<ip de la instancia>:/tmp/anuncios.jar 2>/dev/null \
+scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@"$PUBLIC_IP":/tmp/anuncios.jar 2>/dev/null \
     || { echo "Error: no se ha podido subir el back a la instancia." >&2; exit 1; }
 echo "listo."
 
@@ -40,7 +41,7 @@ echo "Configurando el servicio en la instancia EC2..."
 
 # SECRET_NAME y EXAM_ID viajan como variables de entorno del servicio: no van en el JAR.
 # TODO: Escribe en el comando la IP pública de la instancia.
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> \
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@"$PUBLIC_IP" \
     "SECRET_NAME='$SECRET_NAME' EXAM_ID='$EXAM_ID' bash -s" << 'END_BACKEND'
 set -e
 sudo apt-get update -y

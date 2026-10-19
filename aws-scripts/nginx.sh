@@ -16,20 +16,22 @@ if [ ! -f "$PROJECT_ROOT/ssh-key/labsuser.pem" ]; then
     exit 1
 fi
 
+PUBLIC_IP=100.60.247.220
+
 echo "Configurando Nginx en la instancia..."
 
 # -T: sin pseudo-terminal, para que no avise al leer el script por stdin
-# TODO: Escribe en el comando la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> bash -s << 'END_NGINX'
+# PUBLIC_IP se pasa al script remoto para incluir la IP en el certificado TLS.
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@"$PUBLIC_IP" \
+    "PUBLIC_IP='$PUBLIC_IP' bash -s" << 'END_NGINX'
 set -e
 sudo apt-get update -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
 
 # Certificado autofirmado para la IP pública (el navegador avisará de que no es de confianza).
-# TODO: Escribe en el comando, dos veces, la IP pública de la instancia.
 sudo openssl req -x509 -nodes -days 30 -newkey rsa:2048 \
     -keyout /etc/ssl/private/anuncios.key -out /etc/ssl/certs/anuncios.crt \
-    -subj "/CN=<ip de la instancia>" -addext "subjectAltName=IP:<ip de la instancia>" 2>/dev/null \
+    -subj "/CN=$PUBLIC_IP" -addext "subjectAltName=IP:$PUBLIC_IP" 2>/dev/null \
     || { echo "Error: no se pudo generar el certificado. Revisa la IP escrita en este comando." >&2; exit 1; }
 
 sudo tee /etc/nginx/sites-available/default > /dev/null << 'NGINX_CONF'
