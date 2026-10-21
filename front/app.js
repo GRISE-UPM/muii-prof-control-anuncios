@@ -36,7 +36,8 @@ const base64url = (bytes) =>
   btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
 const urlCognito = () => `https://${window.COGNITO_CONFIG.domain}.auth.${window.COGNITO_CONFIG.region}.amazoncognito.com`;
-const urlRetorno = () => `${location.origin}/`;
+const urlRetorno = () => `${location.origin}/callback`;
+const urlLogout = () => `${location.origin}/logout`;
 
 async function entrar() {
   if (!window.COGNITO_CONFIG) {
@@ -88,7 +89,7 @@ function salir() {
   accessToken = null;
   const parametros = new URLSearchParams({
     client_id: window.COGNITO_CONFIG.clientId,
-    logout_uri: urlRetorno(),
+    logout_uri: urlLogout(),
   });
   location.href = `${urlCognito()}/logout?${parametros}`;
 }

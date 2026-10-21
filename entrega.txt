@@ -1,3 +1,3 @@
 # EXAM_ID lo escribe bash params.sh. La IP de la instancia la escribe aws-scripts/ec2.sh.
-EXAM_ID=676767
-INSTANCE_IP=35.175.34.141
+EXAM_ID=021066
+INSTANCE_IP=3.227.124.201

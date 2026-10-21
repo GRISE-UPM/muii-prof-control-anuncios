@@ -32,7 +32,7 @@ fi
 
 echo -n "Subiendo el back a la instancia... "
 # TODO: Escribe en el comando la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@35.175.34.141:/tmp/anuncios.jar 2>/dev/null \
+scp -q -o StrictHostKeyChecking=no -i "$PROJECT_ROOT/ssh-key/labsuser.pem" "$BACKEND_JAR" ubuntu@3.227.124.201:/tmp/anuncios.jar 2>/dev/null \
     || { echo "Error: no se ha podido subir el back a la instancia." >&2; exit 1; }
 echo "listo."
 
@@ -40,7 +40,7 @@ echo "Configurando el servicio en la instancia EC2..."
 
 # SECRET_NAME y EXAM_ID viajan como variables de entorno del servicio: no van en el JAR.
 # TODO: Escribe en el comando la IP pública de la instancia.
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@35.175.34.141 \
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@3.227.124.201 \
     "SECRET_NAME='$SECRET_NAME' EXAM_ID='$EXAM_ID' bash -s" << 'END_BACKEND'
 set -e
 sudo apt-get update -y
