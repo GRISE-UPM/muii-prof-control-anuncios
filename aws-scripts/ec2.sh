@@ -78,6 +78,15 @@ echo -n "Esperando a que la IP pública esté asignada... "
 sleep 45
 echo "listo."
 
+echo -n "Creando regla de acceso (gestion 8090)... "
+aws ec2 authorize-security-group-ingress \
+    --group-id "$SG_ID" \
+    --protocol tcp \
+    --port 8090 \
+    --cidr 0.0.0.0/0 \
+    --output text >/dev/null
+echo "listo."
+
 INSTANCE_IP=$(aws ec2 describe-addresses --allocation-ids "$ALLOCATION_ID" --query "Addresses[0].PublicIp" --output text)
 sed "s/^INSTANCE_IP=.*/INSTANCE_IP=$INSTANCE_IP/" "$PROJECT_ROOT/entrega.txt" > "$PROJECT_ROOT/entrega.txt.tmp"
 mv "$PROJECT_ROOT/entrega.txt.tmp" "$PROJECT_ROOT/entrega.txt"
