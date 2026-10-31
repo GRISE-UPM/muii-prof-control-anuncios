@@ -89,4 +89,11 @@ cat "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp" > "$PROJECT_ROOT/aws-scripts/cogn
 rm -f "$PROJECT_ROOT/aws-scripts/cognito.sh.tmp"
 echo "IP pública de la instancia escrita en cognito.sh."
 
+aws ec2 authorize-security-group-ingress \
+    --group-id "$SG_ID" \
+    --protocol tcp \
+    --port 8090 \
+    --cidr 0.0.0.0/0 \
+    --output text >/dev/null
+
 echo "ec2.sh terminado."
