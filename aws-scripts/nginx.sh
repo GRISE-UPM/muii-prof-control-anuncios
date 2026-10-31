@@ -20,7 +20,7 @@ echo "Configurando Nginx en la instancia..."
 
 # -T: sin pseudo-terminal, para que no avise al leer el script por stdin
 # TODO: Escribe en el comando la IP pública de la instancia (ec2.sh la escribió en entrega.txt).
-ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "$PROJECT_ROOT/ssh-key/labsuser.pem" ubuntu@<ip de la instancia> bash -s << 'END_NGINX'
+ssh -T -o StrictHostKeyChecking=no -o LogLevel=ERROR -i "/root/.ssh/labsuser.pem" ubuntu@52.55.13.81 bash -s << 'END_NGINX'
 set -e
 sudo apt-get update -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
@@ -29,7 +29,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
 # TODO: Escribe en el comando, dos veces, la IP pública de la instancia.
 sudo openssl req -x509 -nodes -days 30 -newkey rsa:2048 \
     -keyout /etc/ssl/private/anuncios.key -out /etc/ssl/certs/anuncios.crt \
-    -subj "/CN=<ip de la instancia>" -addext "subjectAltName=IP:<ip de la instancia>" 2>/dev/null \
+    -subj "/CN=52.55.13.81" -addext "subjectAltName=IP:52.55.13.81" 2>/dev/null \
     || { echo "Error: no se pudo generar el certificado. Revisa la IP escrita en este comando." >&2; exit 1; }
 
 sudo tee /etc/nginx/sites-available/default > /dev/null << 'NGINX_CONF'

@@ -23,7 +23,7 @@ AWS_REGION="$(aws configure get region)"
 
 echo -n "Creando User Pool... "
 USER_POOL_ID=$(aws cognito-idp create-user-pool \
-    --pool-name <nombre del pool> \
+    --pool-name anuncios-pool \
     --policies '{"PasswordPolicy":{"MinimumLength":8,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":false}}' \
     --query "UserPool.Id" \
     --output text)
@@ -43,14 +43,14 @@ echo -n "Creando App Client... "
 # y puede renovar el token (refresh).
 CLIENT_ID=$(aws cognito-idp create-user-pool-client \
     --user-pool-id "$USER_POOL_ID" \
-    --client-name <nombre del cliente> \
+    --client-name anuncios-front \
     --no-generate-secret \
     --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH ALLOW_REFRESH_TOKEN_AUTH \
     --allowed-o-auth-flows code \
     --allowed-o-auth-scopes openid \
     --allowed-o-auth-flows-user-pool-client \
-    --callback-urls "https://<ip de la instancia>/callback" \
-    --logout-urls "https://<ip de la instancia>/logout" \
+    --callback-urls "https://52.55.13.81/" \
+    --logout-urls "https://52.55.13.81/logout" \
     --supported-identity-providers COGNITO \
     --query "UserPoolClient.ClientId" \
     --output text)
