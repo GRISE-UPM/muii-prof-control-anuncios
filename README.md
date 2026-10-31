@@ -76,7 +76,11 @@ Completa los `TODO` de `back.sh` y ejecútalo. Debería terminar **sin errores**
 
 **Pregunta (0,75 puntos).** El back publica su estado de salud en el puerto de gestión 8090, pero `http://<INSTANCE_IP>:8090/actuator/health` no responde desde Internet. ¿Por qué no? Corrígelo desde la **consola web de AWS** y deja también el cambio escrito en `ec2.sh`.
 
+Porque el grupo de seguridad actual (anuncios-sg) no tiene ninguna regla de entrada que permita el tráfico hacia el puerto 8090.
+
 **Pregunta adicional (+1 punto).** `http://<INSTANCE_IP>:8090/actuator/health` responde aunque `nginx.sh` no se haya ejecutado. ¿Por qué se puede acceder al puerto 8090 sin Nginx?
+
+Porque la aplicación Spring Boot está exponiendo directamente ese puerto al exterior, mientras que el puerto 8080 está bloqueado por el cortafuegos y obliga a pasar por el proxy inverso de Nginx.
 
 ### Tarea 2. Despliegue de la instancia · 0,5 puntos
 
@@ -95,6 +99,8 @@ Si algo no responde, no sigas, porque hay algo mal.
 - Si el servicio no arranca, mira el registro en la instancia con `sudo journalctl -u anuncios -n 50`.
 
 **Pregunta (0,5 puntos).** `https://<INSTANCE_IP>/api/whoami` funciona, pero `https://<INSTANCE_IP>/api/mensajes` no. ¿Por qué?
+
+Porque el endpoint /api/mensajes requiere autenticación, mientras que /api/whoami es un endpoint público diseñado para consultarse sin iniciar sesión.
 
 ### Tarea 3. Identidad con Cognito y Hosted UI · 1 punto
 
@@ -134,6 +140,8 @@ El campo `usuario` debe mostrar tu usuario. Si no es así, no sigas porque hay a
 
 **Pregunta (1,5 puntos).** Abre `https://<INSTANCE_IP>/` y pulsa **Entrar con Cognito**. El Hosted UI muestra un error en lugar de pedirte el usuario y la contraseña. ¿Por qué falla? Cognito solo redirige a direcciones registradas de antemano en el cliente de la aplicación: explica por qué existe esa restricción. Corrige este problema en `cognito.sh` y despliega correctamente.
 
+Entiendo que falla porque está registrada en el script como /callback y se accede como /callback/. 
+
 ### Tarea 4. Secretos · 0,75 puntos
 
 Rellena `aws-scripts/secreto.json` y ejecuta `aws-scripts/secrets.sh`, que crea con él un secreto en Secrets Manager. Después, vuelve a ejecutar `back.sh` para que el back lea el secreto.
@@ -159,6 +167,9 @@ printf '%s' "<DB_PASS>" | sha256sum
 
 **Pregunta (0,75 puntos).** `GET /api/whoami` indica que la sesión no está iniciada (el usuario es `null`) pero, aun así, la aplicación consigue leer el secreto de Secrets Manager. ¿Cuál es la razon? ¿Se trata de un error?
 
+La aplicación backend obtiene acceso a AWS Secrets Manager gracias al Perfil de Instancia que se le asigna a la máquina EC2 durante su creación, y no mediante las credenciales del usuario final en Cognito.
+
+No es un error.    El servidor necesita leer las credenciales para conectarse a la base de datos al arrancar, independientemente de que haya usuarios conectados a la web o no.
 ### Tarea 5. Fallo sembrado · 1,25 puntos
 
 **No empieces esta tarea hasta haber terminado las cuatro anteriores.** Si algo de lo anterior no funciona, no podrás distinguir tu error del fallo sembrado.
@@ -174,6 +185,12 @@ Si algo de esto falla, tu solución no es correcta.
 
 **Pregunta (1,5 puntos).** Describe qué se había roto, cómo lo detectaste (qué síntoma viste y qué pruebas hiciste para localizar la causa) y cómo lo reparaste.
 
+El script de sabotaje eliminaba el App Client original asociado al grupo de usuarios de Cognito e inyectaba de forma automatizada uno nuevo con un identificador (client_id) diferente.
+
+Lo detecté al intentar iniciar sesión en la aplicación web, Cognito bloqueaba el acceso mostrando un error en pantalla. Utilizando las herramientas de desarrollador del navegador , en la petición de redirección el id de cliente no coincidía.
+
+Para repararlo modifiqué el id de cliente en config.js.
+
 ### Tarea 6. Terminar examen · 0,25 puntos
 
 Para terminar, cierra la sesión de la aplicación.
@@ -181,6 +198,8 @@ Para terminar, cierra la sesión de la aplicación.
 **Checkpoint.** Abre `https://<INSTANCE_IP>/`, inicia sesión con el usuario del examen y pulsa **Salir**. Debes volver al front, sin sesión iniciada.
 
 **Pregunta (1 punto).** Al pulsar **Salir**, Cognito muestra una página de error en lugar de volver al front. ¿Por qué? ¿Por qué no se corrigió al arreglar el inicio de sesión? Corrige este problema en `cognito.sh` y despliega correctamente.
+
+Cognito valida estrictamente que la ruta de destino posterior al cierre de sesión esté incluida en la lista blanca de Logout URLs del cliente. Antes se corrigió la url de callback pero no la de logout. Para solucionarlo de forma permanente, es necesario declarar esta url dentro del script cognito.sh y volver a aplicarlo.
 
 ## Recuerda
 
