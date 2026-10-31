@@ -2,6 +2,25 @@
 
 **Duración:** 2 horas · **Modalidad:** individual, con todo el material, internet y asistentes de IA permitidos · **Entrega:** un *pull request* del *fork* del repositorio.
 
+## Entrega
+
+La entrega es un *pull request* desde la rama `main` de tu *fork* contra la rama `main` del repositorio original (rellena la plantilla). Su fecha y su contenido forman parte de la evidencia.
+
+**Se entregan** (haz *commit* de ellos).
+
+- `entrega.txt`, con `EXAM_ID` e `INSTANCE_IP` correctos (el EXAM_ID lo escribe `params.sh` y la IP, `ec2.sh`).
+- `sabotaje.txt`, que escribe `sabotaje.sh` al terminar la Tarea 5. Debe estar en la raíz del repositorio.
+- Los ficheros que corrijas en `aws-scripts/` (`ec2.sh`, `cognito.sh`, `secreto.json`, etc.) y en `back/`.
+
+**No se entregan** (no los subas).
+
+- `params.txt`, que contiene tus parámetros y la contraseña de la base de datos (está en `.gitignore`).
+- La clave SSH del laboratorio (`ssh-key/labsuser.pem` y cualquier `.pem`; también está en `.gitignore`).
+- Los ficheros que generan los scripts (`front/config.js`, `back/src/main/resources/cognito.properties` y `back/target/`), igualmente en `.gitignore`.
+- Ficheros ajenos al examen, como los `*:Zone.Identifier` que crea Windows al copiar ficheros o `.DS_Store`.
+
+Las respuestas a las preguntas abiertas **no van en el repositorio**, sino en el cuestionario de Moodle.
+
 ## La aplicación
 
 Una aplicación de anuncios mínima, prácticamente igual a la utilizada en el simulacro de examen. Cualquier usuario autenticado puede leer anuncios, y el administrador es el único que puede publicarlos.
