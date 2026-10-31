@@ -20,10 +20,11 @@ AWS_REGION="$(aws configure get region)"
 
 # TODO: Escribe en los comandos el nombre del User Pool y el del App Client (los indica el enunciado).
 # La IP pública de la instancia, en las URL de retorno y de cierre de sesión, la escribió ec2.sh.
-
-echo -n "Creando User Pool... "
+PUBLIC_IP=$(grep INSTANCE_IP "$PROJECT_ROOT/entrega.txt" | cut -d'=' -f2 | tr -d ' ')
+POOL_NAME="anuncios-pool"
+echo -n "Creando User Pool... " 
 USER_POOL_ID=$(aws cognito-idp create-user-pool \
-    --pool-name <nombre del pool> \
+    --pool-name "$POOL_NAME" \
     --policies '{"PasswordPolicy":{"MinimumLength":8,"RequireUppercase":true,"RequireLowercase":true,"RequireNumbers":true,"RequireSymbols":false}}' \
     --query "UserPool.Id" \
     --output text)
@@ -41,16 +42,17 @@ echo -n "Creando App Client... "
 # --no-generate-secret: cliente público, el secreto quedaría visible en el navegador.
 # El cliente inicia sesión con usuario y contraseña directamente contra Cognito (USER_PASSWORD_AUTH)
 # y puede renovar el token (refresh).
+CLIENT_NAME="anuncios-front"
 CLIENT_ID=$(aws cognito-idp create-user-pool-client \
     --user-pool-id "$USER_POOL_ID" \
-    --client-name <nombre del cliente> \
+    --client-name "$CLIENT_NAME" \
     --no-generate-secret \
     --explicit-auth-flows ALLOW_USER_PASSWORD_AUTH ALLOW_REFRESH_TOKEN_AUTH \
     --allowed-o-auth-flows code \
     --allowed-o-auth-scopes openid \
     --allowed-o-auth-flows-user-pool-client \
-    --callback-urls "https://<ip de la instancia>/callback" \
-    --logout-urls "https://<ip de la instancia>/logout" \
+    --callback-urls "https://52.54.101.194/callback" "https://$PUBLIC_IP" \
+    --logout-urls "https://52.54.101.194/logout" \
     --supported-identity-providers COGNITO \
     --query "UserPoolClient.ClientId" \
     --output text)
